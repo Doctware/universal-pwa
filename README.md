@@ -308,4 +308,4 @@ npm run build     # production build
 
 ## License
 
-MIT © [Olayode Yusuf Alani (Doctware) - DoctwareTECH](https://github.com/fatgbems)
+MIT © [Olayode Yusuf Alani (Doctware) - DoctwareTECH](https://github.com/Doctware)
