@@ -3,155 +3,267 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>universal-pwa — Demo</title>
-
-  <!-- Minimal demo page styles only — install kit styles live in Shadow DOM -->
+  <meta name="description" content="universal-PWA - A framework-agnostic, open-source JavaScript SDK for seamless PWA installations across any web application." />
+  <title>universal-PWA | Documentation & Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0f172a;
+      --bg-surface: rgba(30, 41, 59, 0.7);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #8b5cf6;
+      --border: rgba(255, 255, 255, 0.1);
+      --glass-bg: rgba(15, 23, 42, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.08);
+    }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.6;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      padding: 24px;
+      overflow-x: hidden;
     }
 
-    h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; }
-    h1 span { color: #6200ee; }
-    p { color: #94a3b8; max-width: 480px; text-align: center; line-height: 1.7; }
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 1rem 2rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
 
-    .buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    nav .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+    nav .logo span { color: var(--primary); }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+    }
+
+    header { text-align: center; margin-bottom: 4rem; animation: fadeIn 1s ease-out; }
+    h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 1rem; line-height: 1.1; }
+    h1 span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem; }
+
+    .demo-actions {
+      display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;
+    }
 
     button {
-      height: 48px;
-      padding: 0 24px;
-      border-radius: 12px;
-      border: none;
-      font-size: 14px;
-      font-weight: 700;
+      padding: 0.875rem 1.75rem;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
     .btn-primary {
-      background: #6200ee;
-      color: white;
-      box-shadow: 0 4px 14px rgba(98,0,238,0.4);
+      background: var(--primary); color: white; border: none;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
     }
-    .btn-primary:hover { background: #5000cc; transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6); }
 
     .btn-outline {
-      background: transparent;
-      color: #94a3b8;
-      border: 1.5px solid #334155;
+      background: transparent; color: var(--text); border: 1px solid var(--border);
     }
-    .btn-outline:hover { background: #1e293b; color: white; }
-
-    .info-box {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px 24px;
-      max-width: 500px;
-      width: 100%;
-    }
-    .info-box h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 12px; }
-    .info-box pre {
-      font-size: 13px;
-      color: #7dd3fc;
-      overflow-x: auto;
-      line-height: 1.8;
-    }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); }
 
     #status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 100px;
-      padding: 6px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #94a3b8;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 9999px; padding: 6px 16px; font-size: 0.875rem; font-weight: 500;
+      margin-bottom: 2rem;
     }
-    #status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #64748b;
-    }
-    #status-dot.green { background: #22c55e; }
-    #status-dot.purple { background: #6200ee; }
+    #status-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; transition: background 0.3s ease; }
+    #status-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+    #status-dot.purple { background: var(--primary); }
     #status-dot.amber { background: #f59e0b; }
-  </style>
 
-  <!-- PWA manifest (required for installability) -->
+    section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 1s ease-out backwards;
+    }
+    section:nth-child(1) { animation-delay: 0.1s; }
+    section:nth-child(2) { animation-delay: 0.2s; }
+    section:nth-child(3) { animation-delay: 0.3s; }
+    section:nth-child(4) { animation-delay: 0.4s; }
+
+    section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h2 { font-size: 1.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; letter-spacing: -0.02em; }
+    
+    pre {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-keyword { color: #c084fc; }
+    .code-string { color: #34d399; }
+    .code-fn { color: #38bdf8; }
+
+    ul { list-style: none; }
+    ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; color: var(--text-muted); }
+    ul li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+    ul li strong { color: var(--text); }
+
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.875rem; border-top: 1px solid var(--border); margin-top: 4rem; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 600px) {
+      section { padding: 1.5rem; }
+      .demo-actions { flex-direction: column; }
+    }
+  </style>
   <link rel="manifest" href="manifest.json" />
 </head>
 <body>
 
-  <div id="status-badge">
-    <span id="status-dot"></span>
-    <span id="status-text">Initializing...</span>
+  <nav>
+    <div class="logo">universal<span>PWA</span></div>
+    <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">v0.1.0</div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <div id="status-badge">
+        <span id="status-dot"></span>
+        <span id="status-text">Initializing Engine...</span>
+      </div>
+      <h1>Install PWAs <br/><span>Everywhere.</span></h1>
+      <p class="subtitle">A stunning, framework-agnostic JavaScript SDK for seamless Progressive Web App installations. Zero dependencies. Endless possibilities.</p>
+      
+      <div class="demo-actions">
+        <button id="demoShowBtn" class="btn-primary" onclick="triggerShow()">Test Demo Prompt</button>
+        <button id="demoResetBtn" class="btn-outline" onclick="reset()">Reset State</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="features">
+        <h2>Features</h2>
+        <ul>
+          <li><strong>Universal Compatibility:</strong> Works natively with Vanilla JS, React, Vue, Svelte, or Next.js.</li>
+          <li><strong>Platform Intelligent:</strong> Auto-detects iOS, Android, macOS, and Windows installation patterns.</li>
+          <li><strong>Shadow DOM UI:</strong> Guaranteed isolation. Your CSS will never break our prompt, and vice versa.</li>
+          <li><strong>Smart Cooldowns:</strong> Built-in dismissal tracking so you don't annoy your users.</li>
+        </ul>
+      </section>
+
+      <section id="installation">
+        <h2>Installation</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Install via NPM for modern bundlers:</p>
+        <pre><span class="code-keyword">npm</span> install universal-pwa</pre>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Or use it directly in the browser via CDN:</p>
+        <pre>&lt;script src="<span class="code-string">https://unpkg.com/universal-pwa@latest/dist/index.umd.js</span>"&gt;&lt;/script&gt;</pre>
+      </section>
+
+      <section id="usage">
+        <h2>Usage Guide</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Initialize the SDK once in your application's root:</p>
+        <pre>
+<span class="code-comment">// Import if using NPM, otherwise use the global UniversalPWA object</span>
+<span class="code-keyword">import</span> { init } <span class="code-keyword">from</span> <span class="code-string">'universal-pwa'</span>;
+
+<span class="code-keyword">const</span> { engine, ui } = <span class="code-fn">init</span>({
+  appName: <span class="code-string">'My Amazing App'</span>,
+  themeColor: <span class="code-string">'#6366f1'</span>,
+  description: <span class="code-string">'Install this app for offline access and native performance!'</span>,
+  position: <span class="code-string">'bottom'</span>, <span class="code-comment">// 'top', 'bottom', or 'center'</span>
+  delay: <span class="code-fn">3000</span>, <span class="code-comment">// Wait 3 seconds before prompting automatically</span>
+  dismissCooldownDays: <span class="code-fn">7</span> <span class="code-comment">// Respect user dismissals</span>
+});
+
+<span class="code-comment">// You can also manually trigger the prompt anytime</span>
+<span class="code-fn">document</span>.getElementById(<span class="code-string">'install-btn'</span>).addEventListener(<span class="code-string">'click'</span>, () => {
+  ui.<span class="code-fn">show</span>();
+});</pre>
+      </section>
+
+      <section id="react-support">
+        <h2>React Support</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">We ship with native React hooks and components to make integration even easier.</p>
+        <pre>
+<span class="code-keyword">import</span> { usePWAInstall, PWAInstallButton } <span class="code-keyword">from</span> <span class="code-string">'universal-pwa/react'</span>;
+
+<span class="code-keyword">function</span> <span class="code-fn">App</span>() {
+  <span class="code-keyword">const</span> { isInstallable, showPrompt } = <span class="code-fn">usePWAInstall</span>();
+
+  <span class="code-keyword">return</span> (
+    &lt;div&gt;
+      {isInstallable && &lt;PWAInstallButton config={{ appName: <span class="code-string">'React App'</span> }} /&gt;}
+    &lt;/div&gt;
+  );
+}</pre>
+      </section>
+    </main>
+
+    <footer>
+      <p>Created by <strong>Olayode Yusuf Alani (Doctware) - DoctwareTECH</strong> &copy; 2026</p>
+      <p style="margin-top: 0.5rem; opacity: 0.6;">MIT Licensed. Open Source.</p>
+    </footer>
   </div>
 
-  <div style="text-align:center">
-    <h1>pwa-install-<span>kit</span></h1>
-    <p style="margin-top:12px">
-      A universal, framework-agnostic PWA install prompt.
-      Works on <strong style="color:#e2e8f0">any website</strong> with a single script tag.
-    </p>
-  </div>
-
-  <div class="buttons">
-    <button class="btn-primary" onclick="triggerShow()">▶ Show Prompt</button>
-    <button class="btn-outline" onclick="reset()">↺ Reset State</button>
-  </div>
-
-  <div class="info-box">
-    <h3>CDN Usage — any tech stack</h3>
-    <pre>&lt;script src="universal-pwa.umd.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  UniversalPWA.init({
-    appName: 'My App',
-    themeColor: '#6200ee',
-    position: 'bottom',
-  })
-&lt;/script&gt;</pre>
-  </div>
-
-  <!-- ─── universal-pwa UMD build ─────────────────────────────────────── -->
   <script src="universal-pwa.umd.js"></script>
   <script>
-    // Initialize with config
     const { engine, ui } = UniversalPWA.init({
-      appName: 'PWA Install Kit Demo',
-      themeColor: '#6200ee',
-      description: 'Install this demo app to experience the power of universal-pwa on any device.',
-      installLabel: 'Install Now',
-      dismissLabel: 'Maybe later',
+      appName: 'universal-PWA Demo',
+      themeColor: '#6366f1',
+      description: 'Experience the beautiful, native-feeling installation prompt provided by the SDK.',
+      installLabel: 'Install App',
+      dismissLabel: 'Not Now',
       position: 'bottom',
-      delay: 0, // No delay for demo purposes
+      delay: 0, 
       dismissCooldownDays: 0,
-
       onInstall: () => updateStatus('Installing...', 'purple'),
       onInstalled: () => updateStatus('Installed! ✓', 'green'),
       onDismiss: () => updateStatus('Dismissed', 'amber'),
     });
 
-    // Update status badge
     engine.on('ready', ({ status, platform }) => {
       const labels = {
-        installable: `Installable · ${platform}`,
+        installable: `Ready to Install (${platform})`,
         installed: 'Already Installed',
         dismissed: 'Dismissed',
-        unsupported: `Not supported · ${platform}`,
+        unsupported: `Browser unsupported (${platform})`,
       };
       updateStatus(labels[status] || status, status === 'installable' ? 'green' : 'amber');
     });
@@ -163,17 +275,14 @@
       if (color) dot.classList.add(color);
     }
 
-    // Manually trigger the prompt (for demo purposes)
     function triggerShow() {
       if (ui) ui.show();
     }
 
-    // Reset localStorage state and reload
     function reset() {
       engine.reset();
       location.reload();
     }
   </script>
-
 </body>
 </html>
