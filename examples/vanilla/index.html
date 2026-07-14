@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>universal-pwa — Demo</title>
+
+  <!-- Minimal demo page styles only — install kit styles live in Shadow DOM -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      padding: 24px;
+    }
+
+    h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; }
+    h1 span { color: #6200ee; }
+    p { color: #94a3b8; max-width: 480px; text-align: center; line-height: 1.7; }
+
+    .buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    button {
+      height: 48px;
+      padding: 0 24px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: #6200ee;
+      color: white;
+      box-shadow: 0 4px 14px rgba(98,0,238,0.4);
+    }
+    .btn-primary:hover { background: #5000cc; transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent;
+      color: #94a3b8;
+      border: 1.5px solid #334155;
+    }
+    .btn-outline:hover { background: #1e293b; color: white; }
+
+    .info-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .info-box h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 12px; }
+    .info-box pre {
+      font-size: 13px;
+      color: #7dd3fc;
+      overflow-x: auto;
+      line-height: 1.8;
+    }
+
+    #status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+    #status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+    #status-dot.green { background: #22c55e; }
+    #status-dot.purple { background: #6200ee; }
+    #status-dot.amber { background: #f59e0b; }
+  </style>
+
+  <!-- PWA manifest (required for installability) -->
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+
+  <div id="status-badge">
+    <span id="status-dot"></span>
+    <span id="status-text">Initializing...</span>
+  </div>
+
+  <div style="text-align:center">
+    <h1>pwa-install-<span>kit</span></h1>
+    <p style="margin-top:12px">
+      A universal, framework-agnostic PWA install prompt.
+      Works on <strong style="color:#e2e8f0">any website</strong> with a single script tag.
+    </p>
+  </div>
+
+  <div class="buttons">
+    <button class="btn-primary" onclick="triggerShow()">▶ Show Prompt</button>
+    <button class="btn-outline" onclick="reset()">↺ Reset State</button>
+  </div>
+
+  <div class="info-box">
+    <h3>CDN Usage — any tech stack</h3>
+    <pre>&lt;script src="universal-pwa.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  UniversalPWA.init({
+    appName: 'My App',
+    themeColor: '#6200ee',
+    position: 'bottom',
+  })
+&lt;/script&gt;</pre>
+  </div>
+
+  <!-- ─── universal-pwa UMD build ─────────────────────────────────────── -->
+  <script src="universal-pwa.umd.js"></script>
+  <script>
+    // Initialize with config
+    const { engine, ui } = UniversalPWA.init({
+      appName: 'PWA Install Kit Demo',
+      themeColor: '#6200ee',
+      description: 'Install this demo app to experience the power of universal-pwa on any device.',
+      installLabel: 'Install Now',
+      dismissLabel: 'Maybe later',
+      position: 'bottom',
+      delay: 0, // No delay for demo purposes
+      dismissCooldownDays: 0,
+
+      onInstall: () => updateStatus('Installing...', 'purple'),
+      onInstalled: () => updateStatus('Installed! ✓', 'green'),
+      onDismiss: () => updateStatus('Dismissed', 'amber'),
+    });
+
+    // Update status badge
+    engine.on('ready', ({ status, platform }) => {
+      const labels = {
+        installable: `Installable · ${platform}`,
+        installed: 'Already Installed',
+        dismissed: 'Dismissed',
+        unsupported: `Not supported · ${platform}`,
+      };
+      updateStatus(labels[status] || status, status === 'installable' ? 'green' : 'amber');
+    });
+
+    function updateStatus(text, color) {
+      document.getElementById('status-text').textContent = text;
+      const dot = document.getElementById('status-dot');
+      dot.className = '';
+      if (color) dot.classList.add(color);
+    }
+
+    // Manually trigger the prompt (for demo purposes)
+    function triggerShow() {
+      if (ui) ui.show();
+    }
+
+    // Reset localStorage state and reload
+    function reset() {
+      engine.reset();
+      location.reload();
+    }
+  </script>
+
+</body>
+</html>
